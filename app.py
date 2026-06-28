@@ -72,7 +72,7 @@ similarity = np.load("data/similarity.npy")
 
 # ==================================================
 
-API_KEY = "d1959c4d05f5f26ce11373450987e590"
+API_KEY = st.secrets["TMDB_API_KEY"]
 
 # ==================================================
 

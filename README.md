@@ -71,6 +71,11 @@ The system uses:
 
 to recommend movies similar to the selected movie.
 
+## Live Demo
+
+https://your-app.streamlit.app
+
+
 ## Future Improvements
 
 - IMDb integration

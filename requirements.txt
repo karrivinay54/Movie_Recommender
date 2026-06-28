@@ -1,0 +1,20 @@
+Streamlit : Streamlit is an open-source Python library that allows developers, data scientists, and AI engineers to build interactive, shareable web applications using only pure Python. It completely eliminates the need to write HTML, CSS, JavaScript, or handle backend routing.
+
+Pandas : Pandas is a popular, open-source Python library used for data manipulation and analysis. It provides fast, flexible data structures like DataFrames (tables) that make it incredibly easy to clean, filter, and analyze structured data from sources like CSV files, Excel, and SQL databases.  
+
+pip install pandas
+
+
+Numpy : NumPy (Numerical Python) is the foundational open-source library for scientific computing and data science in Python. It provides support for large, multi-dimensional arrays and matrices, along with a massive collection of high-level mathematical functions to operate on these arrays quickly and efficiently. 
+
+pip install numpy
+
+
+Requests : The requests library is a popular third-party tool that simplifies sending HTTP requests (like GET and POST) to websites and APIs. Instead of dealing with complex networking protocols, developers use requests to fetch data, authenticate, or submit information with just a few lines of code.
+
+pip install requests
+
+
+Scikit-learn : Scikit-learn (also known as sklearn) is an open-source machine learning library for the Python programming language. It is widely used for data analysis, data mining, and building predictive models. 
+
+pip install scikit-learn

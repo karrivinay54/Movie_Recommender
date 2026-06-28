@@ -63,8 +63,8 @@ img:hover {
 
 # ==================================================
 
-movies = pd.read_csv("movies.csv")
-similarity = np.load("similarity.npy")
+movies = pd.read_csv("data/movies.csv")
+similarity = np.load("data/similarity.npy")
 
 # ==================================================
 

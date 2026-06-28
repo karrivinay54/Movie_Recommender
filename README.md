@@ -11,6 +11,12 @@ This project was built to explore the practical applications of Machine Learning
 ### Recommendations
 
 ![Recommendations](images/Recommendations.png)
+
+## Live Demo
+
+[https://your-app.streamlit.app](https://movierecommender-uyzwbonqf7mbwkfd5dxfih.streamlit.app/)
+
+
 ## Features
 
 * Search movies instantly
@@ -70,11 +76,6 @@ The system uses:
 * Cosine Similarity
 
 to recommend movies similar to the selected movie.
-
-## Live Demo
-
-[https://your-app.streamlit.app](https://movierecommender-uyzwbonqf7mbwkfd5dxfih.streamlit.app/)
-
 
 
 ## Future Improvements

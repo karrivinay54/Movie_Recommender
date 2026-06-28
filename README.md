@@ -73,7 +73,8 @@ to recommend movies similar to the selected movie.
 
 ## Live Demo
 
-https://your-app.streamlit.app
+[https://your-app.streamlit.app](https://movierecommender-uyzwbonqf7mbwkfd5dxfih.streamlit.app/)
+
 
 
 ## Future Improvements

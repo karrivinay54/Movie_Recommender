@@ -101,15 +101,15 @@ div[data-testid="stSelectbox"]{
 # LOAD DATA
 # ==================================================
 
-movies = pd.read_csv("movies.csv")
+movies = pd.read_csv("data/movies.csv")
 
-similarity = np.load("similarity.npy")
+similarity = np.load("data/similarity.npy")
 
 # ==================================================
 # TMDB API
 # ==================================================
 
-API_KEY = "d1959c4d05f5f26ce11373450987e590"
+API_KEY = ""
 
 
 # ==================================================

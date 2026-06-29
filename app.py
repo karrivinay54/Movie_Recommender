@@ -108,7 +108,7 @@ similarity = np.load("data/similarity.npy")
 # TMDB API
 # ==================================================
 
-    API_KEY = st.secrets["TMDB_API_KEY"]
+API_KEY = st.secrets["TMDB_API_KEY"]
 
 # ==================================================
 # FETCH COMPLETE MOVIE DETAILS

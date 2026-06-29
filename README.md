@@ -21,7 +21,7 @@ Designed to provide fast and intelligent movie recommendations through a clean, 
 
 **Enhanced Experience**
 
-🔗 [https://YOUR-V2-STREAMLIT-LINK.streamlit.app](https://movierecommenderv2.streamlit.app/)
+🔗 (https://movierecommenderv2.streamlit.app/)
 
 **Highlights**
 
@@ -37,8 +37,7 @@ Designed to provide fast and intelligent movie recommendations through a clean, 
 
 **Classic Edition**
 
-🔗 [https://YOUR-V1-STREAMLIT-LINK.streamlit.app
-](https://movierecommenderinitialrelease.streamlit.app/)
+🔗 (https://movierecommenderinitialrelease.streamlit.app/)
 
 **Highlights**
 

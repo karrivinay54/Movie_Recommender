@@ -1,10 +1,6 @@
-![Python](https://img.shields.io/badge/Python-3.10-blue)
+![Python](https://img.shields.io/badge/Python-3.10-blue) ![Streamlit](https://img.shields.io/badge/Streamlit-Live-red)
 
-![Streamlit](https://img.shields.io/badge/Streamlit-Live-red)
-
-![Machine Learning](https://img.shields.io/badge/Machine-Learning-green)
-
-![License](https://img.shields.io/badge/License-MIT-orange)
+![Machine Learning](https://img.shields.io/badge/Machine-Learning-green) ![License](https://img.shields.io/badge/License-MIT-orange)
 
 
 # 🎬 Netflix Movie Recommendation System

@@ -1,12 +1,13 @@
+
 import streamlit as st
 import pandas as pd
 import numpy as np
 import requests
+from rapidfuzz import process
+from streamlit_searchbox import st_searchbox
 
 # ==================================================
-
 # PAGE CONFIGURATION
-
 # ==================================================
 
 st.set_page_config(
@@ -16,290 +17,538 @@ st.set_page_config(
 )
 
 # ==================================================
-
-# CUSTOM CSS (NETFLIX STYLE)
-
+# CUSTOM CSS
 # ==================================================
 
 st.markdown("""
+
 <style>
 
-[data-testid="stSidebar"] {
-    display: none;
+/* ---------- Background ---------- */
+
+.stApp{
+    background:#141414;
 }
 
-[data-testid="collapsedControl"] {
-    display: none;
+/* ---------- Hide Streamlit ---------- */
+
+[data-testid="stSidebar"]{
+    display:none;
 }
 
-[data-testid="stHeader"] {
-    display: none;
+[data-testid="collapsedControl"]{
+    display:none;
 }
 
-.stApp {
-    background-color: #141414;
+[data-testid="stHeader"]{
+    display:none;
 }
 
-h1 {
-    color: #E50914;
-    text-align: center;
+/* ---------- Title ---------- */
+
+h1{
+    color:#E50914;
+    text-align:center;
+    font-size:3rem;
 }
 
-img {
-    border-radius: 12px;
-    transition: all 0.3s ease;
+/* ---------- Images ---------- */
+
+img{
+    border-radius:12px;
+    transition:0.3s;
+}
+a:hover{
+    color:#E50914 !important;
 }
 
-img:hover {
-    transform: scale(1.08);
+img:hover{
+    transform:scale(1.05);
+}
+
+/* ---------- Buttons ---------- */
+
+.stButton>button{
+
+    width:100%;
+
+    border-radius:8px;
+
+    background:#E50914;
+
+    color:white;
+
+    border:none;
+
+    font-weight:bold;
+}
+
+/* ---------- Search ---------- */
+
+div[data-testid="stSelectbox"]{
+
+    margin-top:15px;
+
 }
 
 </style>
 """, unsafe_allow_html=True)
 
-# ==================================================
 
+
+
+# ==================================================
 # LOAD DATA
-
 # ==================================================
 
-movies = pd.read_csv("data/movies.csv")
-similarity = np.load("data/similarity.npy")
+movies = pd.read_csv("movies.csv")
+
+similarity = np.load("similarity.npy")
 
 # ==================================================
-
-# TMDB API SETTINGS
-
+# TMDB API
 # ==================================================
 
-API_KEY = st.secrets["TMDB_API_KEY"]
+API_KEY = "d1959c4d05f5f26ce11373450987e590"
+
 
 # ==================================================
-
-# FETCH POSTER
-
+# FETCH COMPLETE MOVIE DETAILS
 # ==================================================
 
-def fetch_poster(movie_id):
+def fetch_movie_details(movie_id):
+
+    url = (
+        f"https://api.themoviedb.org/3/movie/{movie_id}"
+        f"?api_key={API_KEY}"
+    )
 
     try:
 
-        url = (
-            f"https://api.themoviedb.org/3/movie/"
-            f"{movie_id}?api_key={API_KEY}"
-        )
+        response = requests.get(url)
 
-        data = requests.get(url).json()
+        data = response.json()
 
-        poster_path = data.get("poster_path")
+        poster = None
 
-        if poster_path:
+        if data.get("poster_path"):
 
-            return (
-                "https://image.tmdb.org/t/p/w500/"
-                + poster_path
+            poster = (
+                "https://image.tmdb.org/t/p/w500"
+                + data["poster_path"]
             )
 
+        return {
+
+            "poster": poster,
+
+            "rating": data.get(
+                "vote_average",
+                "N/A"
+            ),
+
+            "runtime": data.get(
+                "runtime",
+                "N/A"
+            ),
+
+            "overview": data.get(
+                "overview",
+                "No overview available."
+            ),
+
+            "year": str(
+                data.get(
+                    "release_date",
+                    ""
+                )
+            )[:4],
+
+            "genres": ", ".join(
+
+                genre["name"]
+
+                for genre in data.get(
+                    "genres",
+                    []
+                )
+
+            ),
+
+            "imdb_id": data.get(
+                "imdb_id",
+                ""
+            )
+
+        }
+
     except:
-        pass
 
-    return None
+        return {
+
+            "poster": None,
+
+            "rating": "N/A",
+
+            "runtime": "N/A",
+
+            "overview": "Unavailable",
+
+            "year": "N/A",
+
+            "genres": "N/A",
+
+            "imdb_id": ""
+
+        }
+
+# ==================================================
+# RECOMMEND MOVIES
 # ==================================================
 
-# RECOMMENDATION FUNCTION
-
-# ==================================================
-def recommend(movie):
+def recommend(movie_title):
 
     movie_index = movies[
-        movies["title"] == movie
+        movies["title"] == movie_title
     ].index[0]
-
-    selected_movie_poster = fetch_poster(
-        movies.iloc[movie_index].movie_id
-    )
 
     distances = similarity[movie_index]
 
     movie_list = sorted(
         list(enumerate(distances)),
-        reverse=True,
-        key=lambda x: x[1]
+        key=lambda x: x[1],
+        reverse=True
+    )[1:11]
+
+    # Selected movie
+
+    selected_movie_id = movies.iloc[
+        movie_index
+    ].movie_id
+
+    selected_movie = fetch_movie_details(
+        selected_movie_id
     )
 
-    recommended_movies = []
-    recommended_posters = []
+    selected_movie["title"] = movie_title
 
-    for i in movie_list[1:11]:
+    recommendations = []
 
-        movie_id = movies.iloc[i[0]].movie_id
+    for movie in movie_list:
 
-        recommended_movies.append(
-            movies.iloc[i[0]].title
+        idx = movie[0]
+
+        movie_id = movies.iloc[idx].movie_id
+
+        details = fetch_movie_details(
+            movie_id
         )
 
-        recommended_posters.append(
-            fetch_poster(movie_id)
+        details["title"] = movies.iloc[idx].title
+
+        recommendations.append(
+            details
         )
 
-    return (
-        selected_movie_poster,
-        recommended_movies,
-        recommended_posters
-    )
-
-def get_year(movie_title):
-
-    row = movies[
-        movies["title"] == movie_title
-    ]
-
-    if len(row) > 0:
-
-        release_date = row.iloc[0].get(
-            "release_date",
-            ""
-        )
-
-        if pd.notna(release_date):
-
-            return str(
-                release_date
-            )[:4]
-
-    return "N/A"
+    return selected_movie, recommendations
 
 # ==================================================
+# SEARCH SUGGESTIONS
+# ==================================================
 
-# TITLE
+def search_movies(searchterm: str):
 
+    if not searchterm:
+        return []
+
+    return [
+        movie
+        for movie in movies["title"].tolist()
+        if searchterm.lower() in movie.lower()
+    ][:8]
+
+
+# ==================================================
+# APP TITLE
 # ==================================================
 
 st.markdown(
-    "<h1>🎬 NETFLIX MOVIE RECOMMENDER</h1>",
+    """
+    <h1>
+        🎬 NETFLIX MOVIE RECOMMENDER
+    </h1>
+    """,
     unsafe_allow_html=True
 )
 
-# ==================================================
-
-# SEARCH BOX
 
 # ==================================================
+# SEARCH BAR
+# ==================================================
 
-col1, col2, col3 = st.columns([1,3,1])
+left, center, right = st.columns([1,3,1])
 
-with col2:
+with center:
 
-    selected_movie = st.selectbox(
-        "🔍 Search Movie",
-        movies["title"].tolist(),
-        index=None,
-        placeholder="Type a movie name..."
+    selected_movie = st_searchbox(
+        search_movies,
+        placeholder="🎬 Search any movie...",
+        key="movie_search"
     )
 
 
+    
 # ==================================================
-# AUTO RECOMMENDATION
+# FETCH RECOMMENDATIONS
 # ==================================================
 
 if selected_movie:
 
-    with st.spinner(
-        "🎬 Searching the movie universe..."
-    ):
+    with st.spinner("🎬 Finding similar movies..."):
+        selected_movie_data, recommendations = recommend(selected_movie)
 
-        selected_poster, recommendations, posters = recommend(
-            selected_movie
+    st.markdown("---")
+    st.markdown("<br><br>", unsafe_allow_html=True)
+
+    # ==================================================
+    # HERO SECTION
+    # ==================================================
+
+    left, right = st.columns([1, 2])
+
+    with left:
+
+        if selected_movie_data["poster"]:
+
+            st.image(
+                selected_movie_data["poster"],
+                use_container_width=320
+            )
+
+    with right:
+
+        st.markdown(
+            f"""
+            <h1 style="color:white;margin-bottom:0px;">
+            {selected_movie_data["title"]}
+            </h1>
+            """,
+            unsafe_allow_html=True
         )
 
-    # Selected Movie Heading
+        st.markdown(
+            f"""
+            <p style="color:#BBBBBB;font-size:18px;">
 
-    st.markdown(
-        """
-        <h3 style='text-align:center;color:#E50914;'>
-        Selected Movie
-        </h3>
-        """,
-        unsafe_allow_html=True
-    )
+            ⭐ {selected_movie_data["rating"]}
 
-    # Movie Title
+            &nbsp;&nbsp;|&nbsp;&nbsp;
+
+            🎭 {selected_movie_data["genres"]}
+
+            &nbsp;&nbsp;|&nbsp;&nbsp;
+
+            🕒 {selected_movie_data["runtime"]} min
+
+            &nbsp;&nbsp;|&nbsp;&nbsp;
+
+            📅 {selected_movie_data["year"]}
+
+            </p>
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.markdown(
+            f"""
+            <div style="
+                color:#DDDDDD;
+                font-size:18px;
+                line-height:1.8;
+                text-align:justify;
+            ">
+            {selected_movie_data["overview"]}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.write("")
+        st.markdown(
+    f"""
+    <a href="https://www.imdb.com/title/{selected_movie_data['imdb_id']}"
+       target="_blank"
+       style="
+           display:inline-block;
+           padding:12px 22px;
+           background:#202020;
+           color:white;
+           border:1px solid #E50914;
+           border-radius:10px;
+           text-decoration:none;
+           font-weight:bold;
+       ">
+       🎬 View on IMDb
+    </a>
+    """,
+    unsafe_allow_html=True
+)
+        
+
+
+    st.write("")
+    st.write("")
+
+    # ==================================================
+    # RECOMMENDATION TITLE
+    # ==================================================
 
     st.markdown(
         f"""
-        <h2 style='text-align:center;color:white;'>
+        <h2 style="color:white;">
+        Because you liked
+        <span style="color:#E50914;">
         {selected_movie}
+        </span>
         </h2>
         """,
         unsafe_allow_html=True
     )
 
-    # Selected Movie Poster
-
-    col1, col2, col3 = st.columns([2, 1, 2])
-
-    with col2:
-
-        if selected_poster:
-
-            st.image(
-                selected_poster,
-                width=220
-            )
-
-    # Recommendation Heading
-
-    st.markdown(
-        f"""
-        <h3 style='color:white'>
-        Because you liked
-        <span style='color:#E50914'>
-        {selected_movie}
-        </span>
-        </h3>
-        """,
-        unsafe_allow_html=True
-    )
-
-    # First Row
+    # ==================================================
+    # FIRST ROW
+    # ==================================================
 
     cols = st.columns(5)
 
-    for i in range(min(5, len(recommendations))):
+    for i in range(5):
+
+        movie = recommendations[i]
 
         with cols[i]:
 
-            if posters[i]:
+            if movie["poster"]:
 
                 st.image(
-                    posters[i],
+                    movie["poster"],
                     use_container_width=True
                 )
 
-            st.caption(
-                recommendations[i]
+            st.markdown(
+                f"""
+                <h4 style="
+                    color:white;
+                    text-align:center;
+                    min-height:60px;
+                ">
+                {movie["title"]}
+                </h4>
+                """,
+                unsafe_allow_html=True
             )
 
-    # Second Row
+            st.markdown(
+                f"""
+                <p style="
+                    text-align:center;
+                    color:#BBBBBB;
+                ">
+                ⭐ {movie["rating"]}
+                </p>
+                """,
+                unsafe_allow_html=True
+            )
 
-    if len(recommendations) > 5:
+            st.markdown(
+    f"""
+    <div style="text-align:center;">
+        <a href="https://www.imdb.com/title/{movie['imdb_id']}"
+           target="_blank"
+           style="
+               display:inline-block;
+               padding:8px 18px;
+               background:#202020;
+               color:white;
+               border:1px solid #555;
+               border-radius:8px;
+               text-decoration:none;
+               font-weight:bold;
+           ">
+           IMDb
+        </a>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
-        cols = st.columns(5)
 
-        for i in range(
-            5,
-            min(10, len(recommendations))
-        ):
+    st.write("")
+    st.write("")
 
-            with cols[i - 5]:
+    # ==================================================
+    # SECOND ROW
+    # ==================================================
 
-                if posters[i]:
+    cols = st.columns(5)
 
-                    st.image(
-                        posters[i],
-                        use_container_width=True
-                    )
+    for i in range(5, 10):
 
-                st.caption(
-                    recommendations[i]
+        movie = recommendations[i]
+
+        with cols[i - 5]:
+
+            if movie["poster"]:
+
+                st.image(
+                    movie["poster"],
+                    use_container_width=True
                 )
+
+            st.markdown(
+                f"""
+                <h4 style="
+                    color:white;
+                    text-align:center;
+                    min-height:60px;
+                ">
+                {movie["title"]}
+                </h4>
+                """,
+                unsafe_allow_html=True
+            )
+
+            st.markdown(
+                f"""
+                <p style="
+                    text-align:center;
+                    color:#BBBBBB;
+                ">
+                ⭐ {movie["rating"]}
+                </p>
+                """,
+                unsafe_allow_html=True
+            )
+            
+            st.markdown(
+    f"""
+    <div style="text-align:center;">
+        <a href="https://www.imdb.com/title/{movie['imdb_id']}"
+           target="_blank"
+           style="
+               display:inline-block;
+               padding:8px 18px;
+               background:#202020;
+               color:white;
+               border:1px solid #555;
+               border-radius:8px;
+               text-decoration:none;
+               font-weight:bold;
+           ">
+           IMDb
+        </a>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+            

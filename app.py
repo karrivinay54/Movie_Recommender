@@ -3,7 +3,6 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import requests
-from rapidfuzz import process
 from streamlit_searchbox import st_searchbox
 
 # ==================================================

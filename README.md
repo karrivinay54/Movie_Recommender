@@ -39,6 +39,7 @@ Designed to provide fast and intelligent movie recommendations through a clean, 
 
 🔗 [https://YOUR-V1-STREAMLIT-LINK.streamlit.app
 ](https://movierecommenderinitialrelease.streamlit.app/)
+
 **Highlights**
 
 * Content-Based Recommendation Engine
@@ -294,17 +295,3 @@ GitHub: https://github.com/karrivinay54
 If you found this project useful, consider giving it a ⭐ on GitHub.
 
 Feedback and suggestions are always welcome!
-
-
-
-
-
-
-
-## Additional Downloads
-
-Due to GitHub file size limitations, the following files are hosted on Google Drive:
-
-- similarity.npy : 
-- tmdb_5000_movies.csv.zip : 
-- tmdb_5000_credits.csv.zip : 
